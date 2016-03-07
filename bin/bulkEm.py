@@ -124,7 +124,7 @@ def generateEmail(text,values,debug):
 #===================================================================================================
 # Define string to explain usage of the script
 usage  = "\nUsage: email.py  --base=<dir>  --template=<eml-file>  --distributor=<csv-file>\n";
-usage += "                 [ --help  -debug  --test ]\n\n"
+usage += "                 [ --help --exe --debug  --test ]\n\n"
 
 # Define the valid options which can be specified and check out the command line
 valid = ['base=','template=','distributor=','exe','help','debug','test']
