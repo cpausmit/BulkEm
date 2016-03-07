@@ -17,9 +17,13 @@ There are two files to consider, the distributor and the email template. In the 
 _./default/distributor.csv_ (the default distributor)
 _./default/template.eml_ (the default email template)
 
-WARNING: it is absolutely essential to carefully check these two files carefully. If there is something wrong you might be sending a ton of email to a ton of people. So, please, be careful. Once you are sure it is easy to send them off:
+WARNING: it is absolutely essential to carefully check these two files carefully. If there is something wrong you might be sending a ton of email to a ton of people. So, please, be careful. Once you are sure it is easy to send them off. First do a test run:
 
   bulkEm.py
+
+Then when all looks good:
+
+  bulkEm.py --exe
 
 All parameters can be specified via command line just do:
 
