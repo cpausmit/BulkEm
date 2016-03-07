@@ -1,0 +1,3 @@
+EMAIL:FIRST_NAME:LAST_NAME:COURSE:GRADE:TA_NAME:TA_EMAIL:CC:TEST
+fakeEmailA@fake.org:FirstNameA:LastNameA:16.02:A+:TaNameA:emailTaA@fake.org:fakeEmailCcA@fake.org:y
+fakeEmailB@fake.org:FirstNameB:LastNameB:16.01:F:TaNameB:emailTaB@fake.org:fakeEmailCcB@fake.org:y
