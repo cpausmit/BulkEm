@@ -35,7 +35,7 @@ def getTagsFromString(tags,line):
     return tags
 
 def makeDictionary(tags,line):
-    # make a dictionary out of a given set of column taks and a row from the table
+    # make a dictionary out of a given set of column tags and a row from the table
 
     values = {}
     v = line.split(':')
