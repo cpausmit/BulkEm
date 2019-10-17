@@ -46,7 +46,7 @@ def readEmailFile(spoolFile,debug):
 #===================================================================================================
 # Define string to explain usage of the script
 usage  = "\nUsage: sendFileAsEmail.py  --file=<file>\n";
-usage += "                 [ --exe  --help  --debug  --test ]\n\n"
+usage += "                         [ --exe  --help  --debug  --test ]\n\n"
 
 # Define the valid options which can be specified and check out the command line
 valid = ['file=','help','exe','debug','test']

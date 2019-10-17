@@ -35,13 +35,13 @@ def getTagsFromString(tags,line):
     return tags
 
 def makeDictionary(tags,line):
-    # make a dictionary out of a given set of column taks and a row from the table
+    # make a dictionary out of a given set of column tags and a row from the table
 
     values = {}
     v = line.split(':')
     i = 0
     for tag in tags:
-        value = v[i]
+        value = v[i].strip()
         values[tag] = value
         i += 1
 
@@ -53,13 +53,13 @@ def readDistributor(base,distributor,debug):
     tags = []
     values = []
 
-    cmd = 'cat ' + base + '/' + distributor
+    cmd = 'cat %s/%s | grep -v ^#'%(base,distributor)
     for line in os.popen(cmd).readlines():
         line = line[:-1]
         f = line.split(':')
         if len(tags) < 1:
             for tag in f:
-                tags.append(tag)
+                tags.append(tag.strip())
         else:
             if len(tags) != len(f):
                 print ''
@@ -123,8 +123,8 @@ def generateEmail(text,values,debug):
 # M A I N
 #===================================================================================================
 # Define string to explain usage of the script
-usage  = "\nUsage: email.py  --base=<dir>  --template=<eml-file>  --distributor=<csv-file>\n";
-usage += "                 [ --help --exe --debug  --test ]\n\n"
+usage  = "\nUsage: bulkEm.py  --base=<dir>  --template=<eml-file>  --distributor=<csv-file>\n";
+usage += "                [ --help --exe --debug  --test ]\n\n"
 
 # Define the valid options which can be specified and check out the command line
 valid = ['base=','template=','distributor=','exe','help','debug','test']
