@@ -91,14 +91,16 @@ if not os.path.isfile(spoolFile):
 (emailTags,body) = readEmailFile(spoolFile,debug)
 
 cmd = "mail "
-if 'subject' in emailTags:
-    cmd += "-s '" + emailTags['subject'] + "' "
-if 'cc' in emailTags:
-    cmd += "-c " + emailTags['cc'] + " "
+if 'attach-file' in emailTags:
+    cmd += "-a " + emailTags['attach-file'] + " "
 if 'bcc' in emailTags:
     cmd += "-b " + emailTags['bcc'] + " "
+if 'cc' in emailTags:
+    cmd += "-c " + emailTags['cc'] + " "
 if 'replyto' in emailTags:
     cmd += "-S replyto=" + emailTags['replyto'] + " "
+if 'subject' in emailTags:
+    cmd += "-s '" + emailTags['subject'] + "' "
 
 cmd += emailTags['to'] + " "
     
