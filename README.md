@@ -36,6 +36,8 @@ There are two files to consider, the distributor and the email template. In the 
 
 WARNING: it is absolutely essential to carefully check these two files carefully. If there is something wrong you might be sending a ton of email to a ton of people. So, please, be careful. Once you are sure it is easy to send them off. First do a test run:
 
+* source BulkEm/setup.sh
+* cd BulkEm
 * bulkEm.py
 
 Then when all looks good:
