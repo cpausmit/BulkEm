@@ -83,7 +83,7 @@ for opt, arg in opts:
 
 # Test whether file exists
 if not os.path.isfile(spoolFile):
-    print '\n ERROR - file does not exist.'
+    print '\n ERROR - file does not exist (%s).'%(spoolFile)
     print '         EXIT.\n'
     sys.exit(1)
 
