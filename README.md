@@ -94,7 +94,7 @@ Here is an example email template:
     Dear XX-FIRST_NAME-XX,
   
     please find attached my corrections to your writeups.
-    The overall grade should be appearing very soon in stellar.
+    Your overall grade is XX-GRADE-XX.
   
     I grade 4 categories:
   
@@ -109,3 +109,9 @@ Here is an example email template:
   
     ----
     Christoph Paus - (email: paus@mit.edu)
+
+The corresponding distributor would be:
+
+    EMAIL:LAST_NAME:FIRST_NAME:GRADE:ATTACHMENT
+    paus@mit.edu:Paus:Christoph:A-:example/paper0-cp.pdf
+    bmaier@mit.edu:Maier:Benedikt:A+:example/paper0-bm.pdf
