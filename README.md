@@ -36,15 +36,17 @@ Important always before use to setup. This will make sure the tools get added to
 Sending Emails
 --------------
 
-Easy Way
-........
-
 There are two files to consider, the distributor and the email template. In the default setup they are:
 
 * _./default/distributor.csv_ (the default distributor)
 * _./default/template.eml_ (the default email template)
 
-WARNING: it is absolutely essential to carefully check these two files carefully. If there is something wrong you might be sending a ton of email to a ton of people. So, please, be careful. Once you are sure it is easy to send them off. First do a test run:
+WARNING: it is absolutely essential to carefully check these two files carefully. If there is something wrong you might be sending a ton of email to a ton of people. So, please, be careful. Once you are sure it is easy to send them off. First do a test run.
+
+Find below two examples of how to send email.
+
+Easy Way
+_______
 
 * source BulkEm/setup.sh
 * cd BulkEm
@@ -64,18 +66,24 @@ All parameters can be specified via command line just do:
 
 
 More complex example
-....................
+____________________
 
-If you are more regularly doing bulk email you will want to setup a directory specific to the project and maintain a distributor and separate files for all messages you want to send. So, for my class Course77 I could do something like this:
+Always make sure bulkEm is setup:
 
-* mkdir Course77
-* edit  Course77/students.csv
-* edit  Course77/welcome.eml
-* edit  Course77/results-exam1.eml
+* source BulkEm/setup.sh
+
+If you are more regularly doing bulk email you will want to setup a directory specific to the project and maintain a distributor and separate files for all messages you want to send. So, for my class Course77, I have a supdirectories for my course emails that are kept in the directories of my course notes. I could do something like this:
+
+* cd    Course77
+* mkdir eml
+* edit  eml/students.csv
+* edit  eml/welcome.eml
+* edit  eml/results-exam1.eml
 
 and send out the welcome emails like this:
 
-* bulkEm.py --exe  --base=Course77  --distributor=students.csv  --template=welcome.eml
+* cd Course77
+* bulkEm.py --exe  --base=eml  --distributor=students.csv  --template=welcome.eml
 
 In the distributor file you can freely add more tags they will be automatically searched and replaced in the text using the following pattern XX-_tag_-XX. So, if you define in the distributor a tag called LAST_NAME the template email should contain the string XX-LAST_NAME-XX, which will be replaced in the email that is sent.
 
