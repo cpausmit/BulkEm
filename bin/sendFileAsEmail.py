@@ -83,25 +83,36 @@ for opt, arg in opts:
 
 # Test whether file exists
 if not os.path.isfile(spoolFile):
-    print '\n ERROR - file does not exist (%s).'%(spoolFile)
+    print '\n ERROR - file does not exist (file: %s).'%(spoolFile)
     print '         EXIT.\n'
     sys.exit(1)
 
 # First we need to decode the header and the body
 (emailTags,body) = readEmailFile(spoolFile,debug)
 
+# Construct the command line
 cmd = "mail "
-if 'attach-file' in emailTags:
-    cmd += "-a " + emailTags['attach-file'] + " "
 if 'bcc' in emailTags:
     cmd += "-b " + emailTags['bcc'] + " "
 if 'cc' in emailTags:
     cmd += "-c " + emailTags['cc'] + " "
-if 'replyto' in emailTags:
-    cmd += "-S replyto=" + emailTags['replyto'] + " "
 if 'subject' in emailTags:
     cmd += "-s '" + emailTags['subject'] + "' "
 
+# - take care of client dependence
+CLIENT = os.getenv('BULK_EMAIL_CLIENT','linux'),
+if CLIENT == 'linux':
+    if 'attach-file' in emailTags:
+        cmd += "-a " + emailTags['attach-file'] + " "
+    if 'replyto' in emailTags:
+        cmd += "-S replyto=" + emailTags['replyto'] + " "
+else:
+    if 'attach-file' in emailTags:
+        print ' ERROR -- attachments are not working for your mail client.'
+        sys.exit(0)
+    if 'replyto' in emailTags:
+        cmd = "export REPLYTO=%s; "%(emailTags['replyto']) + cmd
+        
 cmd += emailTags['to'] + " "
     
 cmd += ' <<EOT \n' + body + '\nEOT'
