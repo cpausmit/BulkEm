@@ -21,7 +21,7 @@ Installation
 
 For installation please go to a place where you can find it back easily and proceed:
 
-* git clone git@github.com:cpausmit/BulkEm
+* git clone https://github.com/cpausmit/BulkEm.git
 
 Make sure to adjust the $BULK_EMAIL_CLIENT ('linux' or 'mac') in the install.sh script before executing install:
 
