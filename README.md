@@ -85,27 +85,27 @@ The first row of that file defines the _tags_. A tag is a case sensitive sequenc
 
 Here is an example email template:
 
-  To:          XX-EMAIL-XX
-  Subject:     Corrections for Writeup 0 (XX-FIRST_NAME-XX XX-LAST_NAME-XX)
-  CC:          paus@mit.edu
-  replyto:     paus@mit.edu
-  attach-file: XX-ATTACHMENT-XX
+    To:          XX-EMAIL-XX
+    Subject:     Corrections for Writeup 0 (XX-FIRST_NAME-XX XX-LAST_NAME-XX)
+    CC:          paus@mit.edu
+    replyto:     paus@mit.edu
+    attach-file: XX-ATTACHMENT-XX
   
-  Dear XX-FIRST_NAME-XX,
+    Dear XX-FIRST_NAME-XX,
   
-  please find attached my corrections to your writeups.
-  The overall grade should be appearing very soon in stellar.
+    please find attached my corrections to your writeups.
+    The overall grade should be appearing very soon in stellar.
   
-  I grade 4 categories:
+    I grade 4 categories:
   
-    Theory (15%),
-    Data (30%),
-    Analysis (40%) and
-    Presentation/Form (15%)
+      Theory (15%),
+      Data (30%),
+      Analysis (40%) and
+      Presentation/Form (15%)
   
-  If you have any questions about the grade please contact me.
+    If you have any questions about the grade please contact me.
   
-  Cheers, Christoph
+    Cheers, Christoph
   
-  ----
-  Christoph Paus - (email: paus@mit.edu)
+    ----
+    Christoph Paus - (email: paus@mit.edu)
