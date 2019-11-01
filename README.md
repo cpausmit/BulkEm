@@ -19,20 +19,25 @@ For the mac mail tools it looks like attachments cannot be sent, while the linux
 Installation
 ------------
 
+For installation please go to a place where you can find it back easily and proceed:
+
 * git clone git@github.com:cpausmit/BulkEm
+
+Make sure to adjust the $BULK_EMAIL_CLIENT ('linux' or 'mac') in the install.sh script before executing install:
+
 * cd ./BulkEm
-
-Make sure to adjust the $BULK_EMAIL_CLIENT ('linux' or 'mac') before executing install
-
 * ./install.sh
 
-Important always before use to setup
+Important always before use to setup. This will make sure the tools get added to your program execution PATH.
 
 * source BulkEm/setup.sh
 
 
-Sending Emails - Easy Way
--------------------------
+Sending Emails
+--------------
+
+Easy Way
+........
 
 There are two files to consider, the distributor and the email template. In the default setup they are:
 
@@ -59,7 +64,7 @@ All parameters can be specified via command line just do:
 
 
 More complex example
---------------------
+....................
 
 If you are more regularly doing bulk email you will want to setup a directory specific to the project and maintain a distributor and separate files for all messages you want to send. So, for my class Course77 I could do something like this:
 
