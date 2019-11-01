@@ -114,4 +114,5 @@ The corresponding distributor would be:
 
     EMAIL:LAST_NAME:FIRST_NAME:GRADE:ATTACHMENT
     paus@mit.edu:Paus:Christoph:A-:example/paper0-cp.pdf
-    bmaier@mit.edu:Maier:Benedikt:A+:example/paper0-bm.pdf
+    student-a@mit.edu:Doe:Al:A+:example/paper0-ad.pdf
+    student-b@mit.edu:Doe:Bo:A+:example/paper0-bd.pdf
