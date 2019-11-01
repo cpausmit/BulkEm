@@ -9,7 +9,8 @@ Test this can work for you
 
 Please, test whether you can send email from your computer like this:
 
-* mail -c your_email@xy.com -S replyto=youremail@xy.com -s 'Testing BulkEm' your_email@xy.com
+* _linux:_ mail -c your_email@xy.com -S replyto=your_email@xy.com -s 'Testing BulkEm' recipient@xy.com
+* _mac_:   export REPLYTO=your_email@xy.com; mail -c your_email@xy.com -s 'Testing BulkEm' recipient@xy.com 
 
 Setting up a proper mail client is for some easy for others it can be complicated. Using google usually get's you there. The email delivery can sometimes take some time, but should be done in minutes.
 
@@ -19,6 +20,8 @@ Installation
 
 * git clone git@github.com:cpausmit/BulkEm
 * cd ./BulkEm
+
+make sure to adjust the $BULK_EMAIL_CLIENT (linux or mac) before executing install
 * ./install.sh
 
 Important always before use to setup
