@@ -14,6 +14,7 @@ Please, test whether you can send email from your computer like this:
 
 Setting up a proper mail client is for some easy for others it can be complicated. Using google usually get's you there. The email delivery can sometimes take some time, but should be done in minutes.
 
+For the mac mail tools it looks like attachments cannot be sent, while the linux tools allow this.
 
 Installation
 ------------

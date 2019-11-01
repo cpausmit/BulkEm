@@ -17,6 +17,8 @@
 #---------------------------------------------------------------------------------------------------
 import sys,os,re,getopt
 
+SEPARATOR = os.getenv('BULK_EMAIL_SEPARATOR',':')
+
 def getTagsFromString(tags,line):
     # read this line and find all tags
 
@@ -38,7 +40,7 @@ def makeDictionary(tags,line):
     # make a dictionary out of a given set of column tags and a row from the table
 
     values = {}
-    v = line.split(':')
+    v = line.split(SEPARATOR)
     i = 0
     for tag in tags:
         value = v[i].strip()
@@ -56,7 +58,7 @@ def readDistributor(base,distributor,debug):
     cmd = 'cat %s/%s | grep -v ^#'%(base,distributor)
     for line in os.popen(cmd).readlines():
         line = line[:-1]
-        f = line.split(':')
+        f = line.split(SEPARATOR)
         if len(tags) < 1:
             for tag in f:
                 tags.append(tag.strip())
@@ -196,7 +198,7 @@ for line in table:
     cmd = 'sendFileAsEmail.py --exe --file="' + spoolFile + '"'
     if debug:
         cmd += ' --debug'
-    print ' CMD: ' + cmd
+    print ' ' + cmd
     if exe:
         print ' Sending'
         os.system(cmd)

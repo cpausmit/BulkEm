@@ -10,6 +10,8 @@
 #---------------------------------------------------------------------------------------------------
 import sys,os,re,getopt
 
+CLIENT = os.getenv('BULK_EMAIL_CLIENT','linux')
+
 def readEmailFile(spoolFile,debug):
     # read the email template and find all relevant tags to make sure they are defined
 
@@ -100,7 +102,6 @@ if 'subject' in emailTags:
     cmd += "-s '" + emailTags['subject'] + "' "
 
 # - take care of client dependence
-CLIENT = os.getenv('BULK_EMAIL_CLIENT','linux'),
 if CLIENT == 'linux':
     if 'attach-file' in emailTags:
         cmd += "-a " + emailTags['attach-file'] + " "
