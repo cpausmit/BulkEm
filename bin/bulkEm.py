@@ -195,7 +195,8 @@ for line in table:
     output.close()
     
     # Send the spoolfile as email
-    cmd = 'sendFileAsEmail.py --exe --file="' + spoolFile + '"'
+    #cmd = 'sendFileAsEmail.py --exe --file="' + spoolFile + '"'
+    cmd = 'sendFile.py --exe --file="' + spoolFile + '"'
     if debug:
         cmd += ' --debug'
     print ' ' + cmd
