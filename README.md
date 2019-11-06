@@ -45,6 +45,7 @@ WARNING: it is absolutely essential to carefully check these two files carefully
 
 Find below two examples of how to send email.
 
+_______
 Easy Way
 _______
 
@@ -65,6 +66,7 @@ All parameters can be specified via command line just do:
 * bulkEm.py --help
 
 
+____________________
 More complex example
 ____________________
 
