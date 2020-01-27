@@ -116,7 +116,11 @@ def generateEmail(text,values,debug):
     for tag, value in values.iteritems():
         if debug:
             print " Tag: " + tag + ' ' + value
-
+            
+        # just in case new lines are needed for text processing
+        if '\\n' in value:
+            value = value.replace('\\n','\n')
+            
         emailText = emailText.replace('XX-'+tag+'-XX',value)
 
     return emailText

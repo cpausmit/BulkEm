@@ -117,7 +117,9 @@ email_password = config.get('smtp','password')
     
 # needed for smtp communication (all recipients go here)
 email_send = [ emailTags['to'] ] # recipient list
-for em in ("%s,%s"%(emailTags['cc'],emailTags['bcc'])).split(","):
+
+##for em in ("%s,%s"%(emailTags['cc'],emailTags['bcc'])).split(","):
+for em in emailTags['cc'].split(","):
     if debug:
         print ' APPEND: ' + em.strip()
     email_send.append(em.strip())
