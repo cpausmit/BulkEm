@@ -18,7 +18,6 @@ from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from email import encoders
 
-#CLIENT = os.getenv('BULK_EMAIL_CLIENT','linux')
 SMTP_CFG = os.getenv('BULK_EMAIL_SMTP','.smtp')
 
 def readEmailFile(spoolFile,debug):
@@ -56,6 +55,51 @@ def readEmailFile(spoolFile,debug):
         print " Done reading file"
 
     return emailTags,body
+
+def setupRecipients(emailTags,debug):
+    
+    # needed for smtp communication (all recipients go here)
+    emailSend = [ emailTags['to'] ] # recipient list
+
+    # Add the CC list
+    if 'cc' in emailTags:
+        for em in emailTags['cc'].split(","):
+            if debug:
+                print ' APPEND: ' + em.strip()
+            emailSend.append(em.strip())
+
+    # Add the BCC list. NOTE this list (emailSend) is not what appears in the email text
+    if 'bcc' in emailTags:
+        for em in emailTags['bcc'].split(","):
+            if debug:
+                print ' APPEND: ' + em.strip()
+            emailSend.append(em.strip())
+
+    return emailSend
+
+def setupMessage(emailUser,emailTags,body,debug):
+    # generate the message
+    msg = MIMEMultipart()
+    msg['From'] = emailUser
+    msg['To'] = emailTags['to']
+    if 'cc' in emailTags:
+        msg['CC'] = emailTags['cc']
+    if 'subject' in emailTags:
+        msg['Subject'] = emailTags['subject']
+    if 'replyto' in emailTags:
+        msg.add_header('reply-to',emailTags['replyto'])
+    if 'attach-file' in emailTags:
+        with open(emailTags['attach-file'],"rb") as f:
+            part = MIMEApplication(f.read(),Name=os.path.basename(emailTags['attach-file']))
+            # After the file is closed
+            part['Content-Disposition'] = \
+                'attachment; filename="%s"' % os.path.basename(emailTags['attach-file'])
+            msg.attach(part)
+    
+    # finally add the message body
+    msg.attach(MIMEText(body,'plain'))
+    
+    return msg
 
 #===================================================================================================
 # M A I N
@@ -103,7 +147,6 @@ if not os.path.isfile(spoolFile):
     print '         EXIT.\n'
     sys.exit(1)
 
-
 # Read the smtp configuration file
 config = ConfigParser.RawConfigParser()
 config.read(SMTP_CFG)
@@ -112,38 +155,14 @@ email_server = config.get('smtp','server')
 email_user = config.get('smtp','user')
 email_password = config.get('smtp','password')
 
-# First we need to decode the header and the body
+# Decode the header and the body
 (emailTags,body) = readEmailFile(spoolFile,debug)
-    
-# needed for smtp communication (all recipients go here)
-email_send = [ emailTags['to'] ] # recipient list
 
-##for em in ("%s,%s"%(emailTags['cc'],emailTags['bcc'])).split(","):
-for em in emailTags['cc'].split(","):
-    if debug:
-        print ' APPEND: ' + em.strip()
-    email_send.append(em.strip())
+# Needed for smtp communication (all recipients go here)
+email_send = setupRecipients(emailTags,debug)
 
-# generate the message
-msg = MIMEMultipart()
-msg['From'] = email_user
-msg['To'] = emailTags['to']
-if 'cc' in emailTags:
-    msg['CC'] = emailTags['cc']
-if 'subject' in emailTags:
-    msg['Subject'] = emailTags['subject']
-if 'replyto' in emailTags:
-    msg.add_header('reply-to',emailTags['replyto'])
-if 'attach-file' in emailTags:
-    with open(emailTags['attach-file'],"rb") as f:
-        part = MIMEApplication(f.read(),Name=os.path.basename(emailTags['attach-file']))
-        # After the file is closed
-        part['Content-Disposition'] = 'attachment; filename="%s"' % os.path.basename(emailTags['attach-file'])
-        msg.attach(part)
-
-# finally add the message body
-msg.attach(MIMEText(body,'plain'))
-text = msg.as_string()
+# Generate the message itself
+msg = setupMessage(email_user,emailTags,body,debug)
 
 if debug:
     print " TAGS"
@@ -151,10 +170,10 @@ if debug:
     print " BODY"
     print body
     print " TEXT"
-    print text
+    print msg.as_string()
 if exe:
     server = smtplib.SMTP(email_server,587)
     server.starttls()
     server.login(email_user,email_password)
-    server.sendmail(email_user,email_send,text)
+    server.sendmail(email_user,email_send,msg.as_string())
     server.quit()
