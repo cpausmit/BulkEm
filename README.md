@@ -99,7 +99,7 @@ A word of warning about the separator: if you use the separator in the distribut
 
 The first row of that file defines the _tags_. A tag is a case sensitive sequence of characters, like: FIRST_NAME or last_name. You can define as many tags as you like. The program will for each person on the distribution list read all tag values and replace any of those occurrences in the template to generate the personalized email text. In the template the tags are specially protected by framing them: XX-_tag_-XX.
 
-You should always have a EMAIL tag because you will want to sedn the email to a specific person. It is likely that you also want some version of a name. Please, make sure to keep the series of tags on top of the email without empty lines inbetween. It is very useful before sending the email to check by using the '-debug' flag instead of the '--exe' flag. This will do a dry run and you can see what will be done.
+You should always have a EMAIL tag because you will want to sedn the email to a specific person. It is likely that you also want some version of a name. Please, make sure to keep the series of tags on top of the email without empty lines inbetween. It is very useful before sending the email to check by using the '--debug' flag instead of the '--exe' flag. This will do a dry run and you can see what will be done.
 
 Here is an example email template:
 
