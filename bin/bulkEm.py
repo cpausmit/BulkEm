@@ -17,8 +17,6 @@
 #---------------------------------------------------------------------------------------------------
 import sys,os,re,getopt
 
-SEPARATOR = os.getenv('BULK_EMAIL_SEPARATOR',':')
-
 def getTagsFromString(tags,line):
     # read this line and find all tags
 
@@ -40,7 +38,7 @@ def makeDictionary(tags,line):
     # make a dictionary out of a given set of column tags and a row from the table
 
     values = {}
-    v = line.split(SEPARATOR)
+    v = line.split(separator)
     i = 0
     for tag in tags:
         value = v[i].strip()
@@ -58,25 +56,25 @@ def readDistributor(base,distributor,debug):
     cmd = 'cat %s/%s | grep -v ^#'%(base,distributor)
     for line in os.popen(cmd).readlines():
         line = line[:-1]
-        f = line.split(SEPARATOR)
+        f = line.split(separator)
         if len(tags) < 1:
             for tag in f:
                 tags.append(tag.strip())
         else:
             if len(tags) != len(f):
-                print ''
-                print ' ERROR - invalid line in distributor: ' + line
-                print '         please correct distributor file before proceeding.'
-                print '         EXIT now!' 
-                print ''
+                print('')
+                print(' ERROR - invalid line in distributor: ' + line)
+                print('         please correct distributor file before proceeding.')
+                print('         EXIT now!')
+                print('')
                 sys.exit(1)
             else:
                 values.append(line)
 
     if debug:
-        print '\n Found the following tags:\n'
+        print('\n Found the following tags:\n')
         for tag in tags:
-            print '  -> ' + tag
+            print('  -> ' + tag)
 
     return tags,values
 
@@ -89,21 +87,25 @@ def readTemplate(base,template,tags,debug):
     for line in os.popen(cmd).readlines():
         text += line
         usedTags = getTagsFromString(usedTags,line)
+
+    if text == '':
+        print(" ERROR - no email template text found. EXIT!")
+        sys.exit(1)
                 
     
     if debug:
-        print '\n Found the following used tags:\n'
+        print('\n Found the following used tags:\n')
     for tag in usedTags:
         if tag in tags:
             if debug:
-                print ' defined:  ' + tag
+                print(' defined:  ' + tag)
         else:
-            print ' Tag in template but NOT defined in distributor -- ' + tag
+            print(' Tag in template but NOT defined in distributor -- ' + tag)
             sys.exit(1)
             
     if debug:
-        print '\n Found the following text:\n'
-        print text
+        print('\n Found the following text:\n')
+        print(text)
 
     return usedTags,text
 
@@ -113,9 +115,9 @@ def generateEmail(text,values,debug):
 
     emailText = text
 
-    for tag, value in values.iteritems():
+    for(tag, value) in values.items():
         if debug:
-            print " Tag: " + tag + ' ' + value
+            print(" Tag: " + tag + ' >' + value + '<')
             
         # just in case new lines are needed for text processing
         if '\\n' in value:
@@ -129,16 +131,16 @@ def generateEmail(text,values,debug):
 # M A I N
 #===================================================================================================
 # Define string to explain usage of the script
-usage  = "\nUsage: bulkEm.py  --base=<dir>  --template=<eml-file>  --distributor=<csv-file>\n";
-usage += "                [ --help --exe --debug  --test ]\n\n"
+usage  = "\nUsage: bulkEm.py  --base=<dir>  --template=<eml-file>  --distributor=<csv-file> \n";
+usage += "                [ --separator=$BULK_EMAIL_SEPARATOR --help --exe --debug  --test ]\n\n"
 
 # Define the valid options which can be specified and check out the command line
-valid = ['base=','template=','distributor=','exe','help','debug','test']
+valid = ['base=','template=','distributor=','separator=','exe','help','debug','test']
 try:
     opts, args = getopt.getopt(sys.argv[1:], "", valid)
-except getopt.GetoptError, ex:
-    print usage
-    print str(ex)
+except getopt.GetoptError as ex:
+    print(usage)
+    print(str(ex))
     sys.exit(1)
     
 # --------------------------------------------------------------------------------------------------
@@ -152,11 +154,12 @@ test  = False
 base = './default'
 template = 'template.eml'
 distributor = 'distributor.csv'
+separator = os.getenv('BULK_EMAIL_SEPARATOR',':')
 
 # Read new values from the command line
 for opt, arg in opts:
     if opt == "--help":
-        print usage
+        print(usage)
         sys.exit(0)
     if opt == "--exe":
         exe = True
@@ -166,6 +169,8 @@ for opt, arg in opts:
         test  = True
     if opt == "--base":
         base = arg
+    if opt == "--separator":
+        separator = arg
     if opt == "--template":
         template  = arg
     if opt == "--distributor":
@@ -189,9 +194,9 @@ for line in table:
 
     # Show what we are sending in debug mode
     if debug:
-        print '\n NEXT EMAIL\n ==========\n'
-        print ' spool: ' + spoolFile + '\n'
-        print emailText
+        print('\n NEXT EMAIL\n ==========\n')
+        print(' spool: ' + spoolFile + '\n')
+        print(emailText)
 
     # Create the spool file
     output = open(spoolFile,'w')
@@ -203,7 +208,7 @@ for line in table:
     cmd = 'sendFile.py --exe --file="' + spoolFile + '"'
     if debug:
         cmd += ' --debug'
-    print ' ' + cmd
+    print(' ' + cmd)
     if exe:
-        print ' Sending'
+        print(' Sending')
         os.system(cmd)

@@ -9,7 +9,7 @@
 #                                                           Written: March 05, 2016 (Christoph Paus)
 #---------------------------------------------------------------------------------------------------
 import sys,os,re,getopt
-import ConfigParser
+import configparser as ConfigParser
 
 import smtplib
 from email.mime.application import MIMEApplication
@@ -28,11 +28,11 @@ def readEmailFile(spoolFile,debug):
     emailTags = {}
 
     if debug:
-        print " --> Read file"
+        print(" --> Read file")
     isHeader = True
     cmd = 'cat "' + spoolFile + '"'
     if debug:
-        print ' CMD: ' + cmd
+        print(' CMD: ' + cmd)
     for line in os.popen(cmd).readlines():
         # here we find the header and its tags
         if (':' in line) and isHeader:
@@ -44,7 +44,7 @@ def readEmailFile(spoolFile,debug):
                 # remove leading blank space
                 value = value.lstrip()
                 if debug:
-                    print ' Adding tag: %s -> %s'%(tag,value) 
+                    print(' Adding tag: %s -> %s'%(tag,value) )
                 emailTags[tag] = value
         # here we make the body of the message
         else:
@@ -52,7 +52,7 @@ def readEmailFile(spoolFile,debug):
             body += line
 
     if debug:
-        print " Done reading file"
+        print(" Done reading file")
 
     return emailTags,body
 
@@ -65,14 +65,14 @@ def setupRecipients(emailTags,debug):
     if 'cc' in emailTags:
         for em in emailTags['cc'].split(","):
             if debug:
-                print ' APPEND: ' + em.strip()
+                print(' APPEND: ' + em.strip())
             emailSend.append(em.strip())
 
     # Add the BCC list. NOTE this list (emailSend) is not what appears in the email text
     if 'bcc' in emailTags:
         for em in emailTags['bcc'].split(","):
             if debug:
-                print ' APPEND: ' + em.strip()
+                print(' APPEND: ' + em.strip())
             emailSend.append(em.strip())
 
     return emailSend
@@ -112,9 +112,9 @@ usage += "                         [ --exe  --help  --debug  --test ]\n\n"
 valid = ['file=','help','exe','debug','test']
 try:
     opts, args = getopt.getopt(sys.argv[1:], "", valid)
-except getopt.GetoptError, ex:
-    print usage
-    print str(ex)
+except getopt.GetoptError as ex:
+    print(usage)
+    print(str(ex))
     sys.exit(1)
     
 # --------------------------------------------------------------------------------------------------
@@ -130,7 +130,7 @@ spoolFile = ''
 # Read new values from the command line
 for opt, arg in opts:
     if opt == "--help":
-        print usage
+        print(usage)
         sys.exit(0)
     if opt == "--exe":
         exe = True
@@ -143,8 +143,8 @@ for opt, arg in opts:
 
 # Test whether file exists
 if not os.path.isfile(spoolFile):
-    print '\n ERROR - file does not exist (file: %s).'%(spoolFile)
-    print '         EXIT.\n'
+    print('\n ERROR - file does not exist (file: %s).'%(spoolFile))
+    print('         EXIT.\n')
     sys.exit(1)
 
 # Read the smtp configuration file
@@ -165,12 +165,12 @@ email_send = setupRecipients(emailTags,debug)
 msg = setupMessage(email_user,emailTags,body,debug)
 
 if debug:
-    print " TAGS"
-    print emailTags
-    print " BODY"
-    print body
-    print " TEXT"
-    print msg.as_string()
+    print(" TAGS")
+    print(emailTags)
+    print(" BODY")
+    print(body)
+    print(" TEXT")
+    print(msg.as_string())
 if exe:
     server = smtplib.SMTP(email_server,587)
     server.starttls()
