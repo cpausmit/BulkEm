@@ -11,7 +11,9 @@
 import sys,os,re,getopt
 import configparser as ConfigParser
 
+import ssl
 import smtplib
+
 from email.mime.application import MIMEApplication
 from email.mime.base import MIMEBase
 from email.mime.multipart import MIMEMultipart
@@ -80,7 +82,7 @@ def setupRecipients(emailTags,debug):
 def setupMessage(emailUser,emailTags,body,debug):
     # generate the message
     msg = MIMEMultipart()
-    msg['From'] = emailUser
+    msg['From'] = emailUser+'@mit.edu'
     msg['To'] = emailTags['to']
     if 'cc' in emailTags:
         msg['CC'] = emailTags['cc']
@@ -152,8 +154,10 @@ config = ConfigParser.RawConfigParser()
 config.read(SMTP_CFG)
 # SMTP config
 email_server = config.get('smtp','server')
+email_port = int(config.get('smtp','port'))
 email_user = config.get('smtp','user')
 email_password = config.get('smtp','password')
+email_sender = config.get('smtp','sender')
 
 # Decode the header and the body
 (emailTags,body) = readEmailFile(spoolFile,debug)
@@ -171,9 +175,29 @@ if debug:
     print(body)
     print(" TEXT")
     print(msg.as_string())
+
 if exe:
-    server = smtplib.SMTP(email_server,587)
-    server.starttls()
+    print(" OUTGOING: %s:%d"%(email_server,email_port))
+    print(" SENDER:   %s"%(email_sender))
+    print(" SEND-TO:  %s"%(email_send))
+    print(" TEXT:\n%s"%(msg.as_string()))
+    
+    if email_port == 465:
+        context = ssl.create_default_context()
+        context.check_hostname = False
+        context.verify_mode = ssl.CERT_NONE;
+        server = smtplib.SMTP_SSL(email_server,email_port,context=context)
+    else:
+        server = smtplib.SMTP(email_server,email_port)
+        if email_port != 25:
+            server.starttls()
     server.login(email_user,email_password)
-    server.sendmail(email_user,email_send,msg.as_string())
+    server.sendmail(email_sender,email_send,msg.as_string())
     server.quit()
+
+    # # working for google mail
+    # server = smtplib.SMTP(email_server,email_port)
+    # server.starttls()
+    # server.login(email_user,email_password)
+    # server.sendmail(email_user,email_send,msg.as_string())
+    # server.quit()
