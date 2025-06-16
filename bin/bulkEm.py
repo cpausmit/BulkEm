@@ -8,204 +8,153 @@
 # that one can write. The tags will be the first row of a table. All following rows of the table are
 # the specific specifiction of these tags for one email.
 #
-# Checkout the examples in directory ./default:
+# Checkout the examples in directory (--base) ./default:
 #
-#   - template.eml     -- a template email
-#   - distributor.csv  -- an example distributor file
+#   - (--template)     template.eml     -- a template email
+#   - (--distributor ) distributor.csv  -- an example distributor file
+#   - (--separator)    os.getenv('BULK_EMAIL_SEPARATOR', ':')
 #
 #                                                           Written: March 05, 2016 (Christoph Paus)
 #---------------------------------------------------------------------------------------------------
-import sys,os,re,getopt
+import sys, os, re
+import csv
+from optparse import OptionParser
 
-def getTagsFromString(tags,line):
-    # read this line and find all tags
+def brokenHeader(tags):
+    print(f" brokenHeader: {tags}")
+    return 'EMAIL' not in tags
 
-    while (True):
+def brokenLine(values):
+    try:
+        return '@' not in values['EMAIL']
+    except:
+        return True
+
+def getTagsFromString(tags, line):
+    while True:
         try:
             idx = line.index('XX-')
             line = line[idx:]
-            if line.index('-XX'):
-                jdx = line.index('-XX')
-                tag = line[3:jdx]
-                tags.append(tag)
-                line = line[jdx+3:]
+            jdx = line.index('-XX')
+            tag = line[3:jdx]
+            tags.append(tag)
+            line = line[jdx+3:]
         except:
             break
-
     return tags
 
-def makeDictionary(tags,line):
-    # make a dictionary out of a given set of column tags and a row from the table
-
+def makeDictionary(tags, columns):
     values = {}
-    v = line.split(separator)
-    i = 0
-    for tag in tags:
-        value = v[i].strip()
-        values[tag] = value
-        i += 1
-
+    for i, tag in enumerate(tags):
+        values[tag] = columns[i].strip()
     return values
 
-def readDistributor(base,distributor,debug):
-    # read the distributor and find all relevant tags for personalization
-    
-    tags = []
+def readDistributor(base,distributor,separator,debug):
+    rc = 1
     values = []
+    csvreader = None
+    for s in separator:
+        if debug:
+            print(f" Trying separator: {s}")
+            
+        with open(f"{base}/{distributor}", 'r') as file:
+            try:
+                csvreader = csv.reader(file,delimiter=s)
+                tags = next(csvreader)
+                if brokenHeader(tags):
+                    continue
+                print(f'\n Found the following tags:\n{tags}')
+                for row in csvreader:
+                    values.append(row)
+                    if debug:
+                        print(f'\n Found the following values:\n{values[-1]}')
+                rc = 0
+                break
+            except:
+                continue
+    return rc, tags, values
 
-    cmd = 'cat %s/%s | grep -v ^#'%(base,distributor)
-    for line in os.popen(cmd).readlines():
-        line = line[:-1]
-        f = line.split(separator)
-        if len(tags) < 1:
-            for tag in f:
-                tags.append(tag.strip())
-        else:
-            if len(tags) != len(f):
-                print('')
-                print(' ERROR - invalid line in distributor: ' + line)
-                print('         please correct distributor file before proceeding.')
-                print('         EXIT now!')
-                print('')
-                sys.exit(1)
-            else:
-                values.append(line)
-
-    if debug:
-        print('\n Found the following tags:\n')
-        for tag in tags:
-            print('  -> ' + tag)
-
-    return tags,values
-
-def readTemplate(base,template,tags,debug):
-    # read the email template and find all relevant tags to make sure they are defined
-
+def readTemplate(base, template, tags, debug):
     text = ''
     usedTags = []
-    cmd = 'cat ' + base + '/' + template
+    cmd = f'cat {base}/{template}'
     for line in os.popen(cmd).readlines():
         text += line
-        usedTags = getTagsFromString(usedTags,line)
+        usedTags = getTagsFromString(usedTags, line)
 
-    if text == '':
+    if not text:
         print(" ERROR - no email template text found. EXIT!")
         sys.exit(1)
-                
-    
-    if debug:
-        print('\n Found the following used tags:\n')
+
     for tag in usedTags:
-        if tag in tags:
-            if debug:
-                print(' defined:  ' + tag)
-        else:
-            print(' Tag in template but NOT defined in distributor -- ' + tag)
+        if tag not in tags:
+            print(f" Tag in template but NOT defined in distributor -- {tag}")
             sys.exit(1)
-            
+        elif debug:
+            print(' defined:  ' + tag)
+
     if debug:
         print('\n Found the following text:\n')
         print(text)
+    return usedTags, text
 
-    return usedTags,text
-
-
-def generateEmail(text,values,debug):
-    # generate the specific email text
-
+def generateEmail(text, values, debug):
     emailText = text
-
-    for(tag, value) in values.items():
+    for tag, value in values.items():
         if debug:
             print(" Tag: " + tag + ' >' + value + '<')
-            
-        # just in case new lines are needed for text processing
-        if '\\n' in value:
-            value = value.replace('\\n','\n')
-            
-        emailText = emailText.replace('XX-'+tag+'-XX',value)
-
+        emailText = emailText.replace('XX-' + tag + '-XX', value.replace('\\n', '\n'))
     return emailText
 
 #===================================================================================================
 # M A I N
 #===================================================================================================
-# Define string to explain usage of the script
-usage  = "\nUsage: bulkEm.py  --base=<dir>  --template=<eml-file>  --distributor=<csv-file> \n";
-usage += "                [ --separator=$BULK_EMAIL_SEPARATOR --help --exe --debug  --test ]\n\n"
+usage = "\nUsage: %prog --base=<dir> --template=<eml-file> --distributor=<csv-file> [options]\n"
+parser = OptionParser(usage=usage)
+parser.add_option("--base", dest="base", default="./default", help="Base directory")
+parser.add_option("--template", dest="template", default="template.eml", help="Template file")
+parser.add_option("--distributor", dest="distributor", default="distributor.csv", help="Distributor file")
+parser.add_option("--separator", dest="separator", default=os.getenv('BULK_EMAIL_SEPARATOR', ':|,'), help="Column separator")
+parser.add_option("--exe", action="store_true", dest="exe", default=False, help="Execute send")
+parser.add_option("--debug", action="store_true", dest="debug", default=False, help="Debug mode")
+parser.add_option("--test", action="store_true", dest="test", default=False, help="Test mode")
 
-# Define the valid options which can be specified and check out the command line
-valid = ['base=','template=','distributor=','separator=','exe','help','debug','test']
-try:
-    opts, args = getopt.getopt(sys.argv[1:], "", valid)
-except getopt.GetoptError as ex:
-    print(usage)
-    print(str(ex))
-    sys.exit(1)
-    
-# --------------------------------------------------------------------------------------------------
-# Get all parameters for the production
-# --------------------------------------------------------------------------------------------------
-# Set defaults for each option
-exe = False
-help = False
-debug = False
-test  = False
-base = './default'
-template = 'template.eml'
-distributor = 'distributor.csv'
-separator = os.getenv('BULK_EMAIL_SEPARATOR',':')
+(options, args) = parser.parse_args()
 
-# Read new values from the command line
-for opt, arg in opts:
-    if opt == "--help":
-        print(usage)
-        sys.exit(0)
-    if opt == "--exe":
-        exe = True
-    if opt == "--debug":
-        debug = True
-    if opt == "--test":
-        test  = True
-    if opt == "--base":
-        base = arg
-    if opt == "--separator":
-        separator = arg
-    if opt == "--template":
-        template  = arg
-    if opt == "--distributor":
-        distributor = arg
+base = options.base
+template = options.template
+distributor = options.distributor
+separator = options.separator
+exe = options.exe
+debug = options.debug
+test = options.test
 
-# Read the distributor
-(tags, table) = readDistributor(base,distributor,debug)
+(rc, tags, table) = readDistributor(base, distributor, separator, debug)
+if rc != 0:
+    print(f" ERROR - distributor file not correct: use --debug to see details")
 
-# Read the text template
-(usedTags, text) = readTemplate(base,template,tags,debug)
+(usedTags, text) = readTemplate(base, template, tags, debug)
 
-# Make spool area
-cmd = 'mkdir -p ' + base + '/spool'
-os.system(cmd)
+os.system(f'mkdir -p {base}/spool')
 
-# Generate the corresponding emails
-for line in table:
-    values = makeDictionary(tags,line)
-    emailText = generateEmail(text,values,debug)
-    spoolFile = base + '/spool/' + values['EMAIL'] + '_' + template
+for row in table:
+    values = makeDictionary(tags, row)
+    if brokenLine(values):
+        if debug:
+            print(f" Broken line:\n{values}")
+        continue
+    emailText = generateEmail(text, values, debug)
+    spoolFile = f'{base}/spool/{values["EMAIL"]}_{template}'
 
-    # Show what we are sending in debug mode
     if debug:
         print('\n NEXT EMAIL\n ==========\n')
         print(' spool: ' + spoolFile + '\n')
         print(emailText)
 
-    # Create the spool file
-    output = open(spoolFile,'w')
-    output.write(emailText)
-    output.close()
-    
-    # Send the spoolfile as email
-    #cmd = 'sendFileAsEmail.py --exe --file="' + spoolFile + '"'
-    cmd = 'sendFile.py --exe --file="' + spoolFile + '"'
+    with open(spoolFile, 'w') as output:
+        output.write(emailText)
+
+    cmd = f'sendFile.py --exe --file="{spoolFile}"'
     if debug:
         cmd += ' --debug'
     print(' ' + cmd)
