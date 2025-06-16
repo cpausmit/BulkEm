@@ -20,8 +20,9 @@ import sys, os, re
 import csv
 from optparse import OptionParser
 
-def brokenHeader(tags):
-    print(f" brokenHeader: {tags}")
+def brokenHeader(tags,debug):
+    if debug:
+        print(f" brokenHeader: {tags}")
     return 'EMAIL' not in tags
 
 def brokenLine(values):
@@ -61,7 +62,7 @@ def readDistributor(base,distributor,separator,debug):
             try:
                 csvreader = csv.reader(file,delimiter=s)
                 tags = next(csvreader)
-                if brokenHeader(tags):
+                if brokenHeader(tags,debug):
                     continue
                 print(f'\n Found the following tags:\n{tags}')
                 for row in csvreader:
